@@ -7,7 +7,7 @@
     "iondrive": "./bin/iondrive"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepublish": "find . -name '*.ts' -type f -not -path '*./node_modules/*' -not -path '*./typings/*' > ts-files.txt && ./node_modules/.bin/tsc --module commonjs @ts-files.txt && rm -rf ts-files.txt"
   },
   "repository": {
     "type": "git",
@@ -25,5 +25,8 @@
     "commander": "^2.8.0",
     "moment": "^2.10.2",
     "tar-fs": "^1.5.0"
+  },
+  "devDependencies": {
+    "typescript": "^1.5.0-alpha"
   }
 }

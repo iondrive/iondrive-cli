@@ -1,0 +1,4 @@
+.*.ts
+typings/
+tsd.json
+tsconfig.json
