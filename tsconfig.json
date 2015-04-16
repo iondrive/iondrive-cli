@@ -1,0 +1,28 @@
+{
+    "version": "1.4.1",
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": true
+    },
+    "compileOnSave": true,
+    "filesGlob": [
+        "./**/*.ts",
+        "!./node_modules/**/*.ts"
+    ],
+    "files": [
+        "./index.ts",
+        "./lib/directory-backup.ts",
+        "./lib/log.ts",
+        "./typings/aws-sdk/aws-sdk.d.ts",
+        "./typings/bunyan/bunyan.d.ts",
+        "./typings/commander/commander.d.ts",
+        "./typings/moment/moment.d.ts",
+        "./typings/node/node.d.ts",
+        "./typings/tar-fs/tar-fs.d.ts",
+        "./typings/tsd.d.ts"
+    ]
+}
