@@ -7,7 +7,9 @@ if (process.argv.length === 3) {
 
 program
   .version(require('./package').version)
-  .option('-c, --config <path>', 'set config path. defaults to ~/dev/iondrive.conf')
+  .action(function () {
+    program.outputHelp()
+  })
 
 program
   .command('backup <dir> <bucket>')
@@ -27,3 +29,7 @@ program
   });
 
 program.parse(process.argv);
+// handle no command
+if (!process.argv.slice(2).length) {
+  program.outputHelp();
+}
