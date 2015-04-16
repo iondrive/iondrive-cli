@@ -1,5 +1,5 @@
 {
-  "name": "iondrive-cli",
+  "name": "iondrive",
   "version": "0.0.1",
   "description": "Ion Drive CLI tool.",
   "main": "index.js",
