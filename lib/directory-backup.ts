@@ -8,7 +8,7 @@ import moment = require('moment');
 import log = require('./log');
 
 interface BackupOpts {
-  outputPrefix: string
+  prefix: string
 };
 
 class DirectoryBackup {
@@ -19,7 +19,7 @@ class DirectoryBackup {
   private s3: aws.S3;
 
   constructor(directory: string, bucket: string, awsParams: BackupOpts) {
-    this.fileName = (awsParams.outputPrefix || 'backup') + '-' + moment().format() + '.tar.gz';
+    this.fileName = (awsParams.prefix || 'backup') + '-' + moment().format() + '.tar.gz';
     this.s3 = new aws.S3({
       params: {
         Bucket: bucket,
