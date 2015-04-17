@@ -3,7 +3,7 @@
 declare module "tar-fs" {
   interface packOpts {
     ignore?(name: string);
-    entries?(files: Array<string>);
+    entries?: Array<string>;
     dereference?: boolean;
   }
 
