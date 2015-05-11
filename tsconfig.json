@@ -15,7 +15,6 @@
         "!./typings/**/*.d.ts"
     ],
     "files": [
-        "./index.ts",
         "./lib/backup/directory-backup.ts",
         "./lib/backup/index.ts",
         "./lib/log.ts",

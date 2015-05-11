@@ -1,6 +1,5 @@
 {
   "name": "iondrive",
-  "private": true,
   "version": "0.0.6",
   "description": "IonDrive CLI tool.",
   "main": "index.js",
