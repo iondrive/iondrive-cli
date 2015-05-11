@@ -1,5 +1,5 @@
 import bunyan = require('bunyan');
 
 export = bunyan.createLogger({
-  name: 'ion-backup'
+  name: 'iondrive-cli'
 });

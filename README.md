@@ -1,7 +1,7 @@
 IonDrive-Cli
 =========
 
-The Ion Drive cli combines utilities common to Ion Drive dev team.
+The IonDrive cli combines utilities common to IonDrive dev team.
 
 Use the `iondrive --help` command for more detailed task information.
 
@@ -9,6 +9,15 @@ Use the `iondrive --help` command for more detailed task information.
 
 ```bash
 $ npm install -g iondrive
+```
+
+## Development
+
+Start the project server and app webpack-dev-server. Cli looks for *-app in current path e.g. menulab-app.
+
+```bash
+iondrive serve
+
 ```
 
 ## Backups

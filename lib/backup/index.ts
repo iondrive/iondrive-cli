@@ -1,15 +1,5 @@
 import program = require('commander');
-import DirectoryBackup = require("./lib/directory-backup");
-
-if (process.argv.length === 3) {
-  process.argv.push('--help');
-}
-
-program
-  .version(require('./package').version)
-  .action(function () {
-    program.outputHelp()
-  })
+import DirectoryBackup = require("./directory-backup");
 
 program
   .command('backup <dir> <bucket>')
@@ -27,9 +17,3 @@ program
     console.log('    $ iondrive backup ./dev mybucket');
     console.log();
   });
-
-program.parse(process.argv);
-// handle no command
-if (!process.argv.slice(2).length) {
-  program.outputHelp();
-}

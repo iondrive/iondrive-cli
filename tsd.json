@@ -6,19 +6,19 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "node/node.d.ts": {
-      "commit": "f0aa5507070dc74859b636bd2dac37f3e8cab8d1"
+      "commit": "b04ad99e8b389bf377a2bd3ae582e7ecb553c09a"
     },
     "aws-sdk/aws-sdk.d.ts": {
-      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
+      "commit": "6c2589a6335713cc5b88701d607a2770f1c53b63"
     },
     "moment/moment.d.ts": {
-      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
+      "commit": "6c2589a6335713cc5b88701d607a2770f1c53b63"
     },
     "bunyan/bunyan.d.ts": {
-      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
+      "commit": "6c2589a6335713cc5b88701d607a2770f1c53b63"
     },
     "commander/commander.d.ts": {
-      "commit": "7ca8add069411b3bde47fad7208706801cde8656"
+      "commit": "6c2589a6335713cc5b88701d607a2770f1c53b63"
     }
   }
 }

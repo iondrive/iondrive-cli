@@ -1,4 +1,4 @@
-/// <reference path="../typings/tsd.d.ts"/>
+/// <reference path="../../typings/tsd.d.ts"/>
 
 import path = require('path');
 import fs = require('fs');
@@ -7,7 +7,7 @@ import tarfs = require('tar-fs');
 
 import aws = require('aws-sdk');
 import moment = require('moment');
-import log = require('./log');
+import log = require('../log');
 
 interface BackupOpts {
   prefix: string
@@ -15,7 +15,6 @@ interface BackupOpts {
 
 class DirectoryBackup {
   private targetPath: string;
-
   private fileName: string;
   private totalBytes: number = 0;
   private loadedBytes: number = 0;

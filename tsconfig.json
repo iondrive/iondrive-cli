@@ -11,18 +11,17 @@
     "compileOnSave": true,
     "filesGlob": [
         "./**/*.ts",
-        "!./node_modules/**/*.ts"
+        "!./node_modules/**/*.ts",
+        "!./typings/**/*.d.ts"
     ],
     "files": [
         "./index.ts",
-        "./lib/directory-backup.ts",
+        "./lib/backup/directory-backup.ts",
+        "./lib/backup/index.ts",
         "./lib/log.ts",
-        "./typings/aws-sdk/aws-sdk.d.ts",
-        "./typings/bunyan/bunyan.d.ts",
-        "./typings/commander/commander.d.ts",
-        "./typings/moment/moment.d.ts",
-        "./typings/node/node.d.ts",
-        "./typings/tar-fs/tar-fs.d.ts",
-        "./typings/tsd.d.ts"
+        "./lib/serve/index.ts",
+        "./lib/serve/runner.ts",
+        "./lib/serve/server-runner.ts",
+        "./lib/serve/spa-runner.ts"
     ]
 }

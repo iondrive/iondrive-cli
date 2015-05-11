@@ -5,3 +5,6 @@
 /// <reference path="moment/moment.d.ts" />
 /// <reference path="bunyan/bunyan.d.ts" />
 /// <reference path="commander/commander.d.ts" />
+/// <reference path="nodemon/nodemon.d.ts" />
+/// <reference path="webpack/webpack.d.ts" />
+/// <reference path="webpack-dev-server/webpack-dev-server.d.ts" />
