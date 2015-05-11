@@ -28,6 +28,7 @@ declare module webpack {
 
   interface WebPackInterface{
     (config: any): any;
+    HotModuleReplacementPlugin: any
   }
 
   module webpack {

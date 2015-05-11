@@ -14,21 +14,20 @@ class ServerRunner {
 
   constructor(cwd: string) {
     this.cwd = cwd;
-    this.scriptPath = this.getPackageJson(this.cwd).main;
+    this.scriptPath = require(path.join(this.cwd, 'package')).main;
     this.port = 3000;
   };
 
-  private getPackageJson(targetPath?: string) {
-    return JSON.parse(fs.readFileSync(path.join(targetPath, 'package.json'), 'utf8'));
-  }
-
   public start () {
-    var np = nodemon({
+    nodemon({
       script: path.join(this.cwd, this.scriptPath),
-      ext: 'js json',
-      port: this.port,
-      verbose: true
-    });
+      restartable: 'rs',
+      ignore: ['.git', 'node_modules'],
+      watch: [path.join(this.cwd,'**/*.js')],
+      stdin: true,
+      verbose: true,
+      stdout: true
+    })
   }
 }
 

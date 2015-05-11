@@ -3,32 +3,34 @@ import path = require('path');
 import ServerRunner = require('./server-runner');
 import SpaRunner = require('./spa-runner');
 
+interface IRunnerOpts {
+  hot: boolean
+}
+
 class Runner {
 
   private cwd: string;
+  private opts: IRunnerOpts = { hot: false };
   private serverRunner: ServerRunner;
   private spaRunner: SpaRunner;
   private packageJson: any;
 
-  constructor(cwd: string) {
+  constructor(cwd: string, opts: IRunnerOpts) {
+    this.opts = opts || this.opts;
     this.cwd = cwd;
-    this.packageJson = JSON.parse(fs.readFileSync(path.join(this.cwd, 'package.json'), 'utf8'));
+    this.packageJson = require(path.join(this.cwd, 'package'));
 
     if (this.isServer()) {
       this.serverRunner = new ServerRunner(this.cwd);
     } else if (this.isApp()) {
       this.serverRunner = new ServerRunner(this.findProjectByType('server'));
-      this.spaRunner = new SpaRunner(this.cwd, this.serverRunner);
+      this.spaRunner = new SpaRunner(this.cwd, this.serverRunner, opts);
     }
   }
 
   public start() {
     this.serverRunner.start();
     if (this.spaRunner) this.spaRunner.start();
-  }
-
-  private getPackageJson(targetPath?: string) {
-    return JSON.parse(fs.readFileSync(path.join(targetPath, 'package.json'), 'utf8'));
   }
 
   private isServer() {
