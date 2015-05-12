@@ -6,21 +6,23 @@
         "declaration": false,
         "noImplicitAny": false,
         "removeComments": true,
-        "noLib": false
+        "noLib": false,
+        "outDir": "./lib/"
     },
     "compileOnSave": true,
     "filesGlob": [
-        "./**/*.ts",
-        "!./node_modules/**/*.ts",
-        "!./typings/**/*.d.ts"
+        "./typings/tsd.d.ts",
+        "./src/**/*.ts"
     ],
     "files": [
-        "./lib/backup/directory-backup.ts",
-        "./lib/backup/index.ts",
-        "./lib/log.ts",
-        "./lib/serve/index.ts",
-        "./lib/serve/runner.ts",
-        "./lib/serve/server-runner.ts",
-        "./lib/serve/spa-runner.ts"
+        "./typings/tsd.d.ts",
+        "./src/backup/directory-backup.ts",
+        "./src/backup/index.ts",
+        "./src/index.ts",
+        "./src/log.ts",
+        "./src/serve/index.ts",
+        "./src/serve/runner.ts",
+        "./src/serve/server-runner.ts",
+        "./src/serve/spa-runner.ts"
     ]
 }

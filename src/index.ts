@@ -1,13 +1,13 @@
 import program = require('commander');
 
 program
-  .version(require('./package').version)
+  .version(require('../package').version)
   .action(function () {
     program.outputHelp()
-  })
+  });
 
-require('./lib/backup');
-require('./lib/serve');
+require('./backup/');
+require('./serve/');
 
 program.parse(process.argv);
 // handle no command
