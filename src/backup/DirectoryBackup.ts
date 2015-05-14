@@ -1,15 +1,15 @@
-import path = require('path');
 import fs = require('fs');
+import path = require('path');
 import zlib = require('zlib');
-import tarfs = require('tar-fs');
 
 import aws = require('aws-sdk');
+import chalk = require('chalk');
 import moment = require('moment');
-import log = require('../log');
+import tarfs = require('tar-fs');
 
 interface BackupOpts {
   prefix: string
-};
+}
 
 class DirectoryBackup {
   private targetPath: string;
@@ -27,7 +27,7 @@ class DirectoryBackup {
         Key: this.fileName
       }
     });
-  };
+  }
 
   createReadStream() {
     var fileName;
@@ -42,27 +42,18 @@ class DirectoryBackup {
         entries: fileName && [fileName]
       })
       .pipe(zlib.createGzip())
-  };
+  }
 
   execute() {
-    this.s3.upload({ Body: this.createReadStream() }, (err, data) => {
-      if (err) return log.error(err);
-      log.info({
-        totalBytes: this.totalBytes,
-        loadedBytes: this.loadedBytes,
-        fileName: this.fileName
-      }, 'complete')
-    })
-    .on('httpUploadProgress', (evt) => {
-      this.totalBytes = evt.total;
-      this.loadedBytes = evt.loaded;
+    this.s3.upload({ Body: this.createReadStream() }, (err) => {
+      if (err) return console.log(chalk.red('Error!'), err.message);
 
-      log.info({
-        totalBytes: this.totalBytes,
-        loadedBytes: this.loadedBytes,
-        fileName: this.fileName
-      }, 'progress');
-    });
+      console.log(chalk.green('OK'), `Upload of ${this.fileName} complete. ${this.totalBytes}bytes uploaded.`);
+    })
+      .on('httpUploadProgress', (evt) => {
+        this.totalBytes = evt.total;
+        this.loadedBytes = evt.loaded;
+      });
   }
 };
 

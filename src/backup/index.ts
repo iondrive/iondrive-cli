@@ -1,13 +1,12 @@
 import program = require('commander');
-import DirectoryBackup = require("./directory-backup");
+import DirectoryBackup = require("./DirectoryBackup");
 
 program
   .command('backup <dir> <bucket>')
   .description('Backup directory to S3. Requires AWS credentials http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html')
   .option("-p, --prefix [outputPrefix]", 'set output file name prefix. defaults to backup')
   .action(function(dir, bucket, options) {
-    new DirectoryBackup(dir, bucket, options)
-      .execute();
+    new DirectoryBackup(dir, bucket, options).execute();
   })
   .on('--help', function() {
     console.log('  Examples:');
