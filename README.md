@@ -13,11 +13,49 @@ $ npm install -g iondrive
 
 ## Development
 
-Start the project server and app webpack-dev-server. Cli looks for *-app in current path e.g. menulab-app.
+You know it's best practice to split your project into separate server and client repositories. This however complicates how your project is booted up for development purposes.
+
+Our serve tool aims to boot up a client project along with any server side dependencies with one cli command.
+
+### serve
+
+Ion Drive cli `serve` presumes you have a repository for your server and client side code. When your terminals current working directory (cwd) is that of the client, the ion drive `serve` command will boot up any server dependencies located as a sibling to that of the client project. e.g.
 
 ```bash
+cd mynewproject
+ls
+mynewproject-server
+mynewproject-app
+
+```
+The cli is convention based and will pickup client and server dependencies based on the package json names conforming to the following convention:
+
+* server
+  - appname-{server|api|backend}
+  - e.g. mynewproject-server
+
+* client
+  - appname-{app|client|spa}
+  - e.g. mynewproject-app
+
+Invocation:
+
+```bash  
+cd mynewproject-app
 iondrive serve
 
+```
+
+__Command-line flags/options:__
+
+    [--hot|-h]  ........ Live reload of front end assets.
+    [--no-proxy|-np]  .. Don't overwrite dev server proxy targets.
+
+__Examples with AWS credentials:__
+```bash
+$ AWS_ACCESS_KEY_ID="someid" AWS_SECRET_ACCESS_KEY="somekey" iondrive backup ./dev mybucket
+$ AWS_PROFILE="s3-iondrive" iondrive backup ./dev mybucket
+$ iondrive backup ./dev mybucket
 ```
 
 ## Backups
