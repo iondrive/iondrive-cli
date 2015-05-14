@@ -51,13 +51,6 @@ __Command-line flags/options:__
     [--hot|-h]  ........ Live reload of front end assets.
     [--no-proxy|-np]  .. Don't overwrite dev server proxy targets.
 
-__Examples with AWS credentials:__
-```bash
-$ AWS_ACCESS_KEY_ID="someid" AWS_SECRET_ACCESS_KEY="somekey" iondrive backup ./dev mybucket
-$ AWS_PROFILE="s3-iondrive" iondrive backup ./dev mybucket
-$ iondrive backup ./dev mybucket
-```
-
 ## Backups
 
 Back up any directory by creating a tar.gz stream and piping directly to AWS S3 storage. Backups require AWS credentials managed as per [AWS node configuration guide.](http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-configuring.html)
