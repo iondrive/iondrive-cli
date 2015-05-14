@@ -3,20 +3,14 @@ import path = require('path');
 import ServerRunner = require('./server-runner');
 import SpaRunner = require('./spa-runner');
 
-interface IRunnerOpts {
-  hot: boolean
-}
-
 class Runner {
 
   private cwd: string;
-  private opts: IRunnerOpts = { hot: false };
   private serverRunner: ServerRunner;
   private spaRunner: SpaRunner;
   private packageJson: any;
 
-  constructor(cwd: string, opts: IRunnerOpts) {
-    this.opts = opts || this.opts;
+  constructor(cwd: string, opts) {
     this.cwd = cwd;
     this.packageJson = require(path.join(this.cwd, 'package'));
 
@@ -34,11 +28,11 @@ class Runner {
   }
 
   private isServer() {
-    return this.packageJson.name.indexOf('-server') > -1;
+    return new RegExp('\(server|api|backend)$').test(this.packageJson.name);
   }
 
   private isApp() {
-    return this.packageJson.name.indexOf('-app') > -1;
+    return new RegExp('\(client|app|spa)$').test(this.packageJson.name);
   }
 
   private splitPath (path) {

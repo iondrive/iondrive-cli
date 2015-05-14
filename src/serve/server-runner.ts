@@ -5,17 +5,24 @@ import nodemon = require('nodemon');
 import SpaRunner = require('./spa-runner');
 import log = require('../log');
 
+interface IServerOpts {
+  port: number;
+  host: string;
+}
+
 class ServerRunner {
 
   private cwd: string;
   private scriptPath: string;
 
-  public port: number;
+  public port: number = 3000;
+  public host: string = 'localhost';
 
-  constructor(cwd: string) {
+  constructor(cwd: string, opts?: IServerOpts) {
     this.cwd = cwd;
     this.scriptPath = require(path.join(this.cwd, 'package')).main;
-    this.port = 3000;
+    this.port = (opts && opts.port) || this.port;
+    this.host = (opts && opts.host) || this.host;
   };
 
   public start () {
