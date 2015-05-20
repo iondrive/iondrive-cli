@@ -59,17 +59,51 @@ class ClientRunner {
       webpackOpts.plugins.push(new webpack.HotModuleReplacementPlugin());
     }
 
-    var compiler = webpack(webpackOpts);
-
     var devServerConfig = webpackOpts.devServer || {};
     devServerConfig.hot = this.hot;
     //devServerConfig.inline = this.hot;
     devServerConfig.quiet = false;
     devServerConfig.noInfo = false;
     devServerConfig.stats = { colors: true };
-    devServerConfig.contentBase = compiler.options.output.path;
+    devServerConfig.contentBase = webpackOpts.output.path;
 
-    new WebpackDevServer(compiler, devServerConfig)
+
+    if (devServerConfig.proxy && this.proxy) {
+      var hostPortRegexp = new RegExp("^(.*:)//([A-Za-z0-9\-\.]+)(:[0-9]+)?(.*)$");
+      var serverHostName = `http://${this.serverHost}:${this.serverPort}`;
+      var proxyOrgHostName;
+      Object.keys(devServerConfig.proxy).forEach((key) => {
+        proxyOrgHostName = devServerConfig.proxy[key].replace(hostPortRegexp, serverHostName);
+        devServerConfig.proxy[key] = devServerConfig.proxy[key].replace(hostPortRegexp, serverHostName);
+      });
+
+      // if you're using proxy and webpack.DefinePlugin. Chances are you have a
+      // variable for the location of your api backend. This replaces the
+      // backend API root to that of the proxy by searching all properties that
+      // are equal to the proxy target.
+      if (proxyOrgHostName) {
+        webpackOpts.plugins.forEach((plugin) => {
+          Object.keys(plugin).forEach((key) => {
+            // signals DefinePlugin
+            if (key === 'definitions') {
+              var definitions = plugin[key];
+              Object.keys(definitions).forEach((propKey) => {
+                // find URI constants
+                var defineConst = plugin[key][propKey].replace(/['"]+/g, '');
+                var urlConst = defineConst.replace(hostPortRegexp, '$1//$2$3');
+                // assume constant vars with same hostname+port of proxy target reference the same resource.
+                if (urlConst === proxyOrgHostName) {
+                  var newUrlConst = plugin[key][propKey].replace(hostPortRegexp, `$1//localhost:${this.port}$4`);
+                  plugin[key][propKey] = newUrlConst;
+                }
+              });
+            }
+          });
+        });
+      }
+    }
+
+    new WebpackDevServer(webpack(webpackOpts), devServerConfig)
       .listen(this.port, () => {});
   }
 }

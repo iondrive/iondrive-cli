@@ -49,6 +49,7 @@ iondrive serve
 __Command-line flags/options:__
 
     [--hot|-h]  ........ Live reload of front end assets.
+    [--no-proxy|-np]  .. Don't overwrite dev server proxy targets.
 
 ## Backups
 
