@@ -69,14 +69,6 @@ class ClientRunner {
     devServerConfig.stats = { colors: true };
     devServerConfig.contentBase = compiler.options.output.path;
 
-    if (devServerConfig.proxy && this.proxy) {
-      var hostPortRegexp = new RegExp("^(.*:)//([A-Za-z0-9\-\.]+)(:[0-9]+)?(.*)$");
-      var serverHostName = `http://${this.serverHost}:${this.serverPort}`;
-      Object.keys(devServerConfig.proxy).forEach((key) => {
-        devServerConfig.proxy[key] = devServerConfig.proxy[key].replace(hostPortRegexp, serverHostName);
-      });
-    }
-
     new WebpackDevServer(compiler, devServerConfig)
       .listen(this.port, () => {});
   }
