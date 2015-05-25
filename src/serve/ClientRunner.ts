@@ -53,15 +53,18 @@ class ClientRunner {
     var webpackOpts = require(this.webpackConfigPath);
 
     if (this.hot) {
-      webpackOpts.entry.push('webpack-dev-server/client?http://localhost:' + this.port)
-      webpackOpts.entry.push('webpack/hot/dev-server');
+      var mainEntry = webpackOpts.entry.app || webpackOpts.entry;
+
+      mainEntry.push('webpack-dev-server/client?http://localhost:' + this.port)
+      mainEntry.push('webpack/hot/dev-server');
+
       webpackOpts.plugins = webpackOpts.plugins || [];
       webpackOpts.plugins.push(new webpack.HotModuleReplacementPlugin());
     }
 
     var devServerConfig = webpackOpts.devServer || {};
     devServerConfig.hot = this.hot;
-    //devServerConfig.inline = this.hot;
+    devServerConfig.inline = this.hot;
     devServerConfig.quiet = false;
     devServerConfig.noInfo = false;
     devServerConfig.stats = { colors: true };
