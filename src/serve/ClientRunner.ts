@@ -55,7 +55,7 @@ class ClientRunner {
     if (this.hot) {
       var mainEntry = webpackOpts.entry.app || webpackOpts.entry;
 
-      mainEntry.push('webpack-dev-server/client?https://localhost:' + this.port)
+      mainEntry.push('webpack-dev-server/client?http://localhost:' + this.port)
       mainEntry.push('webpack/hot/dev-server');
 
       webpackOpts.plugins = webpackOpts.plugins || [];
@@ -63,7 +63,6 @@ class ClientRunner {
     }
 
     var devServerConfig = webpackOpts.devServer || {};
-    devServerConfig.https = true;
     devServerConfig.hot = this.hot;
     devServerConfig.inline = this.hot;
     devServerConfig.quiet = false;
@@ -94,12 +93,10 @@ class ClientRunner {
               Object.keys(definitions).forEach((propKey) => {
                 // find URI constants
                 var defineConst = plugin[key][propKey].replace(/['"]+/g, '');
-                var urlConst = defineConst.replace(hostPortRegexp, '$2$3');
-
+                var urlConst = defineConst.replace(hostPortRegexp, '$1//$2$3');
                 // assume constant vars with same hostname+port of proxy target reference the same resource.
-                if (urlConst === proxyOrgHostName.replace(hostPortRegexp, '$2$3')) {
-                  var protocol = 'http' + (devServerConfig.https ? 's' : '');
-                  var newUrlConst = plugin[key][propKey].replace(hostPortRegexp, `"${protocol}://localhost:${this.port}$4`);
+                if (urlConst === proxyOrgHostName) {
+                  var newUrlConst = plugin[key][propKey].replace(hostPortRegexp, `$1//localhost:${this.port}$4`);
                   plugin[key][propKey] = newUrlConst;
                 }
               });
@@ -110,12 +107,7 @@ class ClientRunner {
     }
 
     new WebpackDevServer(webpack(webpackOpts), devServerConfig)
-      .listen(this.port, () => {
-        console.log(chalk.green('Webpack-dev-server'), `running at https://localhost:${this.port}`, this.hot ? chalk.magenta('in hot mode'): '');
-        Object.keys(devServerConfig.proxy).forEach((proxyPath) => {
-          console.log(chalk.green('Proxy ' + proxyPath + ' server'), `running at https://localhost:${this.port}` + proxyPath);
-        });
-      });
+      .listen(this.port, () => {});
   }
 }
 
