@@ -48,8 +48,16 @@ iondrive serve
 
 __Command-line flags/options:__
 
+    [platform]  ........ run against 'ios' or 'android' emulator.
     [--hot|-h]  ........ Live reload of front end assets.
     [--no-proxy|-np]  .. Don't overwrite dev server proxy targets.
+
+#### Platforms ios and android
+
+Running serve with a platform argument of `ios` or 'android', assumes you have `ionic-cli` installed as global.
+Serve [platform] compiles webpack assets and sets any URI constants defined in the DefinePlugin to that of the backend server.
+
+Running with argument hot, uses the webpack-dev-server to host assets, allowing for live reloading.
 
 ## Backups
 

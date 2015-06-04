@@ -8,3 +8,5 @@
 /// <reference path="webpack/webpack.d.ts" />
 /// <reference path="webpack-dev-server/webpack-dev-server.d.ts" />
 /// <reference path="chalk/chalk.d.ts" />
+/// <reference path="http-proxy/http-proxy.d.ts" />
+/// <reference path="rimraf/rimraf.d.ts" />

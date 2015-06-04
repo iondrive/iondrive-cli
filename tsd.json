@@ -22,6 +22,9 @@
     },
     "chalk/chalk.d.ts": {
       "commit": "68114f9ff37de0f92c94126b6e0164e026a1737a"
+    },
+    "rimraf/rimraf.d.ts": {
+      "commit": "c50b111ded0a3a18b87b5abffea3150d6aca94da"
     }
   }
 }

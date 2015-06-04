@@ -1,11 +1,12 @@
 import path = require('path');
-
+import httpProxy = require('http-proxy');
 import chalk = require('chalk');
+import fs = require('fs');
 import nodemon = require('nodemon');
 
 interface ServerOpts {
-  port: number;
-  host: string;
+  port?: number;
+  host?: string;
 }
 
 class ServerRunner {
@@ -15,6 +16,8 @@ class ServerRunner {
 
   public host: string = 'localhost';
   public port: number = 3000;
+
+  public target: string;
 
   constructor(serverDir: string, opts?: ServerOpts) {
     this.serverDir = serverDir;
@@ -49,6 +52,8 @@ class ServerRunner {
       verbose: true,
       stdout: true
     });
+
+    console.log(chalk.green('backend server'), `running at http://localhost:${this.port}`);
   }
 }
 

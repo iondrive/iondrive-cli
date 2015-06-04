@@ -1,6 +1,9 @@
 import fs = require('fs');
 import path = require('path');
+import http = require('http');
+import childProcess = require('child_process');
 
+import rimraf = require('rimraf');
 import chalk = require('chalk');
 import webpack = require("webpack");
 import WebpackDevServer = require("webpack-dev-server");
@@ -13,6 +16,8 @@ interface ClientOpts {
 
   serverHost: string;
   serverPort: number;
+
+  cordova: string;
 }
 
 const WEBPACK_FILENAME = 'webpack.config.js';
@@ -22,11 +27,13 @@ class ClientRunner {
 
   private hot: boolean = false;
   private port: number = 8080;
+  private host: string = 'localhost';
   private proxy: boolean = false;
   private webpackConfigPath: string;
 
   private serverHost: string;
   private serverPort: number;
+  private cordova: string;
 
   constructor(clientDir: string, opts?: ClientOpts) {
     this.clientDir = clientDir;
@@ -38,6 +45,7 @@ class ClientRunner {
 
     this.serverHost = (opts && opts.serverHost) || this.serverHost;
     this.serverPort = (opts && opts.serverPort) || this.serverPort;
+    this.cordova = (opts && opts.cordova) || this.cordova;
   }
 
   private checkWebpackConfigPath() {
@@ -51,15 +59,15 @@ class ClientRunner {
     this.checkWebpackConfigPath();
 
     var webpackOpts = require(this.webpackConfigPath);
-
     if (this.hot) {
       var mainEntry = webpackOpts.entry.app || webpackOpts.entry;
-
       mainEntry.push('webpack-dev-server/client?http://localhost:' + this.port)
       mainEntry.push('webpack/hot/dev-server');
-
       webpackOpts.plugins = webpackOpts.plugins || [];
       webpackOpts.plugins.push(new webpack.HotModuleReplacementPlugin());
+
+      // delete and previous outputs as webpack-dev-server hosts all in memory.
+      rimraf.sync(webpackOpts.output.path + '/*');
     }
 
     var devServerConfig = webpackOpts.devServer || {};
@@ -69,7 +77,6 @@ class ClientRunner {
     devServerConfig.noInfo = false;
     devServerConfig.stats = { colors: true };
     devServerConfig.contentBase = webpackOpts.output.path;
-
 
     if (devServerConfig.proxy && this.proxy) {
       var hostPortRegexp = new RegExp("^(.*:)//([A-Za-z0-9\-\.]+)(:[0-9]+)?(.*)$");
@@ -84,6 +91,7 @@ class ClientRunner {
       // variable for the location of your api backend. This replaces the
       // backend API root to that of the proxy by searching all properties that
       // are equal to the proxy target.
+
       if (proxyOrgHostName) {
         webpackOpts.plugins.forEach((plugin) => {
           Object.keys(plugin).forEach((key) => {
@@ -93,11 +101,13 @@ class ClientRunner {
               Object.keys(definitions).forEach((propKey) => {
                 // find URI constants
                 var defineConst = plugin[key][propKey].replace(/['"]+/g, '');
-                var urlConst = defineConst.replace(hostPortRegexp, '$1//$2$3');
+                var urlConst = defineConst.replace(hostPortRegexp, '$2');
+
                 // assume constant vars with same hostname+port of proxy target reference the same resource.
-                if (urlConst === proxyOrgHostName) {
-                  var newUrlConst = plugin[key][propKey].replace(hostPortRegexp, `$1//localhost:${this.port}$4`);
-                  plugin[key][propKey] = newUrlConst;
+                if (urlConst === proxyOrgHostName.replace(hostPortRegexp, '$2')) {
+                  var host = (this.cordova && !this.hot) ? this.serverHost : this.host;
+                  var port = (this.cordova && !this.hot) ? this.serverPort : this.port;
+                  plugin[key][propKey] = plugin[key][propKey].replace(hostPortRegexp, `"http://${host}:${port}$4`);
                 }
               });
             }
@@ -106,8 +116,44 @@ class ClientRunner {
       }
     }
 
-    new WebpackDevServer(webpack(webpackOpts), devServerConfig)
-      .listen(this.port, () => {});
+    var compiler = webpack(webpackOpts);
+    if (this.cordova) {
+      if (this.hot) {
+        // cordova requires an index.html page. So create one and address webpack-dev-server assets
+        webpackOpts.output.publicPath = 'http://localhost:' + this.port + '/';
+      }
+
+      compiler.plugin('done', (stats) => {
+        childProcess.exec('cd ' + devServerConfig.contentBase + ' && ionic run ' + this.cordova, () => {
+          console.log(chalk.green(this.cordova + ' simulator'), (this.hot ? 'connected to webpack-dev-server ' + chalk.magenta('in hot mode') : 'running local assets'));
+        });
+
+        // if we're in hot mode create an index.html file which references the webpack-dev-server assets
+        if (this.hot) {
+          var indexAsset = stats.compilation.assets['index.html'];
+          if (indexAsset) {
+            fs.writeFileSync(path.join(devServerConfig.contentBase, 'index.html'), indexAsset.source())
+          }
+        }
+      });
+
+    }
+
+    if (this.cordova && !this.hot) {
+      console.log(chalk.green('webpack'), 'compiling assets for', this.cordova, '...');
+      compiler.run(() => {
+        console.log(chalk.green('webpack'), 'compiled assets for', this.cordova);
+      })
+    } else {
+      new WebpackDevServer(compiler, devServerConfig)
+        .listen(this.port, () => {
+          console.log(chalk.green('webpack-dev-server'), `running at http://localhost:${this.port}`, this.hot ? chalk.magenta('in hot mode'): '');
+          Object.keys(devServerConfig.proxy).forEach((proxyPath) => {
+            console.log(chalk.green('proxy ' + proxyPath + ' server'), `running at http://localhost:${this.port}` + proxyPath);
+          });
+        });
+    }
+
   }
 }
 

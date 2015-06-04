@@ -30,10 +30,14 @@ class Runner {
     if (this.isClient()) {
       this.serverRunner = new ServerRunner(this.findServerPath());
       opts.serverHost = this.serverRunner.host;
-      opts.serverPort = this.serverRunner.port;      
+      opts.serverPort = this.serverRunner.port;
       this.clientRunner = new ClientRunner(this.runnerDir, opts);
     }
-    if (this.isServer()) {
+    else if (this.isServer()) {
+      if (opts.cordova) {
+        console.error(chalk.red('ERR!'), 'Cordova can only run from client projects.');
+        process.exit(1);
+      }
       this.serverRunner = new ServerRunner(this.runnerDir);
     }
   }
