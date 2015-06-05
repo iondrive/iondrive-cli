@@ -3,10 +3,12 @@ import httpProxy = require('http-proxy');
 import chalk = require('chalk');
 import fs = require('fs');
 import nodemon = require('nodemon');
+import network = require('../network')
 
 interface ServerOpts {
   port?: number;
   host?: string;
+  device?: boolean;
 }
 
 class ServerRunner {
@@ -29,7 +31,7 @@ class ServerRunner {
       process.exit(1);
     }
 
-    this.host = (opts && opts.host) || this.host;
+    this.host = (opts && opts.device) ? network.getLanIp() : this.host;
     this.port = (opts && opts.port) || this.port;
   }
 
@@ -53,7 +55,7 @@ class ServerRunner {
       stdout: true
     });
 
-    console.log(chalk.green('backend server'), `running at http://localhost:${this.port}`);
+    console.log(chalk.green('backend server'), `running at http://${this.host}:${this.port}`);
   }
 }
 

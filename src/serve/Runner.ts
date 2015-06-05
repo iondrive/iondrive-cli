@@ -28,7 +28,7 @@ class Runner {
     this.rootModuleName = this.package.name.split('-')[0];
 
     if (this.isClient()) {
-      this.serverRunner = new ServerRunner(this.findServerPath());
+      this.serverRunner = new ServerRunner(this.findServerPath(), opts);
       opts.serverHost = this.serverRunner.host;
       opts.serverPort = this.serverRunner.port;
       this.clientRunner = new ClientRunner(this.runnerDir, opts);
@@ -38,7 +38,7 @@ class Runner {
         console.error(chalk.red('ERR!'), 'Cordova can only run from client projects.');
         process.exit(1);
       }
-      this.serverRunner = new ServerRunner(this.runnerDir);
+      this.serverRunner = new ServerRunner(this.runnerDir, opts);
     }
   }
 

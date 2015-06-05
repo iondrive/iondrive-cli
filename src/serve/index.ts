@@ -6,6 +6,7 @@ program
   .description('Serve a server|client project. All client side projects have their server dependency booted up')
   .option("-h, --hot", 'Hot reloads of client side code. Default when platform is specified.')
   .option("-np, --no-proxy", "Don't override proxy paths to server hostname and port.")
+  .option("-d, --device", "Target physical device.")
   .action(function(platform, options) {
     if (platform && ['ios', 'android'].indexOf(platform.toLowerCase()) > -1 ) {
       options.cordova = platform.toLowerCase();

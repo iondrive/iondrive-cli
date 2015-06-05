@@ -19,6 +19,7 @@
         "./src/backup/DirectoryBackup.ts",
         "./src/backup/index.ts",
         "./src/index.ts",
+        "./src/network.ts",
         "./src/serve/ClientRunner.ts",
         "./src/serve/Runner.ts",
         "./src/serve/ServerRunner.ts",
