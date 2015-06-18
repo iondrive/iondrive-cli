@@ -47,11 +47,12 @@ class ServerRunner {
   public start() {
     var started = false;
     var child = child_process.spawn(path.join(__dirname, '../../node_modules/.bin/nodemon'), [
-      path.join(this.serverDir, this.package.main),
-      '--watch ' + this.serverDir,
+      this.package.main,
+      '-e js',
       '--ignore .git',
       '--ignore node_modules',
     ], {
+      cwd: this.serverDir,
       env: _.extend(this.env, process.env)
     })
     child.stderr.pipe(process.stderr);
