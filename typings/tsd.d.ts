@@ -10,3 +10,6 @@
 /// <reference path="chalk/chalk.d.ts" />
 /// <reference path="http-proxy/http-proxy.d.ts" />
 /// <reference path="rimraf/rimraf.d.ts" />
+/// <reference path="glob/glob.d.ts" />
+/// <reference path="minimatch/minimatch.d.ts" />
+/// <reference path="lodash/lodash.d.ts" />

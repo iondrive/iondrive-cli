@@ -1,9 +1,9 @@
 import path = require('path');
-import httpProxy = require('http-proxy');
+import child_process = require('child_process');
+
 import chalk = require('chalk');
-import fs = require('fs');
-import nodemon = require('nodemon');
-import network = require('../network')
+import _ = require('lodash');
+import network = require('../network');
 
 interface ServerOpts {
   port?: number;
@@ -20,6 +20,7 @@ class ServerRunner {
   public port: number = 3000;
 
   public target: string;
+  public name: string;
 
   constructor(serverDir: string, opts?: ServerOpts) {
     this.serverDir = serverDir;
@@ -31,32 +32,37 @@ class ServerRunner {
       process.exit(1);
     }
 
+    this.name = this.package['name'];
     this.host = (opts && opts.device) ? network.getLanIp() : this.host;
-    this.port = (opts && opts.port) || this.port;
-  }
+    this.setEnv();
+  };
 
   private setEnv() {
     try {
       this.env = require(path.join(this.serverDir, './env/development'));
+      this.port = this.env['APP_PORT'] || this.port;
     } catch (e) {}
-  }
+  };
 
   public start() {
-    this.setEnv();
-
-    nodemon({
-      script: path.join(this.serverDir, this.package.main),
-      restartable: 'rs',
-      env: this.env,
-      ignore: ['.git', 'node_modules'],
-      watch: [path.join(this.serverDir, '**/*.js')],
-      stdin: true,
-      verbose: true,
-      stdout: true
+    var started = false;
+    var child = child_process.spawn(path.join(__dirname, '../../node_modules/.bin/nodemon'), [
+      path.join(this.serverDir, this.package.main),
+      '--watch ' + this.serverDir,
+      '--ignore .git',
+      '--ignore node_modules',
+    ], {
+      env: _.extend(this.env, process.env)
+    })
+    child.stderr.pipe(process.stderr);
+    child.stdout.pipe(process.stdout);
+    child.stdout.on('data', (data) => {
+      if (data.toString().indexOf('listening') > -1 && !started) {
+        console.log(chalk.green(this.name), `running at http://${this.host}:${this.port}`);
+        started = true;
+      }
     });
-
-    console.log(chalk.green('backend server'), `running at http://${this.host}:${this.port}`);
-  }
+  };
 }
 
 export = ServerRunner;
