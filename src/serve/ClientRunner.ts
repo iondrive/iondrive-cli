@@ -106,7 +106,7 @@ class ClientRunner {
               var definitions = plugin[key];
               Object.keys(definitions).forEach((propKey) => {
                 // find URI constants
-                var defineConst = plugin[key][propKey].replace(/['"]+/g, '');
+                var defineConst = (plugin[key][propKey] || "").replace(/['"]+/g, '');
                 var urlConst = defineConst.replace(hostPortRegexp, '$2');
                 // assume constant vars with same hostname+port of proxy target reference the same resource.
                 if (urlConst === proxyOrgHostName.replace(hostPortRegexp, '$2') || this.device) {
@@ -136,7 +136,7 @@ class ClientRunner {
             fs.writeFileSync(path.join(devServerConfig.contentBase, 'index.html'), indexAsset.source())
           }
         }
-        
+
         console.log(path.resolve(devServerConfig.contentBase, '..'))
         var device = childProcess.spawn('ionic', ['run', this.cordova, (this.device ? ' --device' : '')], {
           cwd: path.resolve(devServerConfig.contentBase, '..'),
