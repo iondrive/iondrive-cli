@@ -28,7 +28,7 @@ class ServerRunner {
     try {
       this.package = require(path.join(this.serverDir, './package'));
     } catch (e) {
-      console.error(chalk.red('ERR!'), 'No package.json in current directory.', this.serverDir);
+      console.error(chalk.red('ERR!'), 'No package.json in current directory.', path.join(this.serverDir, './package'));
       process.exit(1);
     }
 
