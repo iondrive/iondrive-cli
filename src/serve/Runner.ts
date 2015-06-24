@@ -43,6 +43,11 @@ class Runner {
     if (this.isClient()) {
       this.servers = dependencies.map((dependency) => {
         var project = _.findWhere(projectPackages, { name: dependency });
+        if (!project) {
+          console.error(chalk.red('ERR!'), 'Dependency not found.', dependency);
+          process.exit(1);
+        }
+
         return new ServerRunner(project['dir'], opts);
       });
 
@@ -63,7 +68,7 @@ class Runner {
           return new ServerRunner(project['dir'], opts);
         });
       }
-
+      
       this.servers.push(new ServerRunner(this.runnerDir, opts));
     }
   }
