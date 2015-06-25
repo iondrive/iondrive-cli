@@ -3,24 +3,28 @@ import path = require('path');
 import http = require('http');
 import childProcess = require('child_process');
 
+
 import rimraf = require('rimraf');
 import chalk = require('chalk');
 import webpack = require("webpack");
 import WebpackDevServer = require("webpack-dev-server");
+import _ = require('lodash');
 
 import network = require('../network');
+import env = require('../env');
+
+interface ModuleEnvs {
+  API_URI: string
+}
 
 interface ClientOpts {
   port: number;
   hot: boolean;
   proxy: boolean;
   webpackConfigPath: string;
-
-  serverHost: string;
-  serverPort: number;
-
   cordova: string;
   device: boolean;
+  lan: boolean;
 }
 
 const WEBPACK_FILENAME = 'webpack.config.js';
@@ -34,8 +38,6 @@ class ClientRunner {
   private proxy: boolean = false;
   private webpackConfigPath: string;
 
-  private serverHost: string;
-  private serverPort: number;
   private cordova: string;
   private device: boolean = false;
 
@@ -43,14 +45,11 @@ class ClientRunner {
     this.clientDir = clientDir;
 
     this.device = (opts && opts.device) || this.device;
-    this.host = (opts && opts.device) ? network.getLanIp() : this.host;
+    this.host = (opts && opts.device || opts.lan) ? network.getLanIp() : this.host;
     this.port = (opts && opts.port) || this.port;
     this.hot = (opts && opts.hot) || this.hot;
     this.proxy = (opts && opts.proxy) || this.proxy;
     this.webpackConfigPath = (opts && opts.webpackConfigPath) || path.join(this.clientDir, WEBPACK_FILENAME);
-
-    this.serverHost = (opts && opts.serverHost) || this.serverHost;
-    this.serverPort = (opts && opts.serverPort) || this.serverPort;
     this.cordova = (opts && opts.cordova) || this.cordova;
   }
 
@@ -63,8 +62,9 @@ class ClientRunner {
 
   public start() {
     this.checkWebpackConfigPath();
-
+    var projectEnv = _.extend(process.env, env.configure(this.clientDir, this.host, this.port));
     var webpackOpts = require(this.webpackConfigPath);
+
     if (this.hot) {
       var mainEntry = webpackOpts.entry.app || webpackOpts.entry;
       mainEntry.push('webpack-dev-server/client?http://' + this.host + ':' + this.port)
@@ -84,41 +84,20 @@ class ClientRunner {
     devServerConfig.stats = { colors: true };
     devServerConfig.contentBase = webpackOpts.output.path;
 
-    if (devServerConfig.proxy && this.proxy) {
-      var hostPortRegexp = new RegExp("^(.*:)//([A-Za-z0-9\-\.]+)(:[0-9]+)?(.*)$");
-      var serverHostName = `http://${this.serverHost}:${this.serverPort}`;
-      var proxyOrgHostName;
-      Object.keys(devServerConfig.proxy).forEach((key) => {
-        proxyOrgHostName = devServerConfig.proxy[key].replace(hostPortRegexp, serverHostName);
-        devServerConfig.proxy[key] = devServerConfig.proxy[key].replace(hostPortRegexp, serverHostName);
-      });
-
-      // if you're using proxy and webpack.DefinePlugin. Chances are you have a
-      // variable for the location of your api backend. This replaces the
-      // backend API root to that of the proxy by searching all properties that
-      // are equal to the proxy target.
-
-      if (proxyOrgHostName) {
-        webpackOpts.plugins.forEach((plugin) => {
-          Object.keys(plugin).forEach((key) => {
-            // signals DefinePlugin
-            if (key === 'definitions') {
-              var definitions = plugin[key];
-              Object.keys(definitions).forEach((propKey) => {
-                // find URI constants
-                var defineConst = (plugin[key][propKey] || "").replace(/['"]+/g, '');
-                var urlConst = defineConst.replace(hostPortRegexp, '$2');
-                // assume constant vars with same hostname+port of proxy target reference the same resource.
-                if (urlConst === proxyOrgHostName.replace(hostPortRegexp, '$2') || this.device) {
-                  var host = (this.cordova && !this.hot) ? this.serverHost : this.host;
-                  var port = (this.cordova && !this.hot) ? this.serverPort : this.port;
-                  plugin[key][propKey] = plugin[key][propKey].replace(hostPortRegexp, `"http://${host}:${port}$4`);
-                }
-              });
-            }
-          });
-        });
-      }
+    if (this.proxy && webpackOpts.devServer.proxy && !this.device) {
+      const URI_REGEXP = new RegExp("^(.*:)//([A-Za-z0-9\-\.]+)(:[0-9]+)?(.*)$");
+      webpackOpts.plugins.forEach((plugin) => {
+        Object.keys(plugin).forEach((key) => {
+         // signals DefinePlugin
+          if (key === 'definitions') {
+            var definitions = plugin[key];
+            Object.keys(definitions).forEach((propKey) => {
+              var defineConst = (plugin[key][propKey] || "").replace(/['"]+/g, '');
+              plugin[key][propKey] = JSON.stringify(defineConst.replace(URI_REGEXP, `http://$2:${this.port}$4`));
+            })
+          }
+        })
+      })
     }
 
     var compiler = webpack(webpackOpts);
@@ -136,10 +115,11 @@ class ClientRunner {
             fs.writeFileSync(path.join(devServerConfig.contentBase, 'index.html'), indexAsset.source())
           }
         }
-
         console.log(path.resolve(devServerConfig.contentBase, '..'))
+
         var device = childProcess.spawn('ionic', ['run', this.cordova, (this.device ? ' --device' : '')], {
           cwd: path.resolve(devServerConfig.contentBase, '..'),
+          env: projectEnv,
           stdio: 'inherit'
         });
 

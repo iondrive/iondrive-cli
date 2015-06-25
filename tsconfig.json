@@ -18,6 +18,7 @@
         "./typings/tsd.d.ts",
         "./src/backup/DirectoryBackup.ts",
         "./src/backup/index.ts",
+        "./src/env.ts",
         "./src/index.ts",
         "./src/network.ts",
         "./src/serve/ClientRunner.ts",

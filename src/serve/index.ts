@@ -8,6 +8,7 @@ program
   .option("-np, --no-proxy", "Don't override proxy paths to server hostname and port.")
   .option("-d, --device", "Target physical device.")
   .option("-a, --all", "Boot up dependencies")
+  .option("-l, --lan", "Address servers by local network ip")
   .action(function(platform, options) {
     if (platform && ['ios', 'android'].indexOf(platform.toLowerCase()) > -1 ) {
       options.cordova = platform.toLowerCase();

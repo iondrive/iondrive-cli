@@ -3,12 +3,15 @@ import child_process = require('child_process');
 
 import chalk = require('chalk');
 import _ = require('lodash');
+
 import network = require('../network');
+import env = require('../env');
 
 interface ServerOpts {
   port?: number;
   host?: string;
   device?: boolean;
+  lan?: boolean;
 }
 
 class ServerRunner {
@@ -33,13 +36,13 @@ class ServerRunner {
     }
 
     this.name = this.package['name'];
-    this.host = (opts && opts.device) ? network.getLanIp() : this.host;
+    this.host = (opts && opts.device || opts.lan) ? network.getLanIp() : this.host;
     this.setEnv();
   };
 
   private setEnv() {
     try {
-      this.env = require(path.join(this.serverDir, './env/development'));
+      this.env = env.configure(this.serverDir, this.host, this.port);
       this.port = this.env['APP_PORT'] || this.port;
     } catch (e) {}
   };
@@ -53,7 +56,7 @@ class ServerRunner {
       '--ignore node_modules',
     ], {
       cwd: this.serverDir,
-      env: _.extend(this.env, process.env)
+      env: _.extend(process.env, this.env)
     })
     child.stderr.pipe(process.stderr);
     child.stdout.pipe(process.stdout);
