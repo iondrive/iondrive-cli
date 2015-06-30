@@ -48,7 +48,7 @@ class ClientRunner {
     this.host = (opts && opts.device || opts.lan) ? network.getLanIp() : this.host;
     this.port = (opts && opts.port) || this.port;
     this.hot = (opts && opts.hot) || this.hot;
-    this.proxy = (opts && opts.proxy) || this.proxy;
+    this.proxy = opts ? !opts.lan : (opts.proxy || this.proxy);
     this.webpackConfigPath = (opts && opts.webpackConfigPath) || path.join(this.clientDir, WEBPACK_FILENAME);
     this.cordova = (opts && opts.cordova) || this.cordova;
   }
