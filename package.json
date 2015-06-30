@@ -1,6 +1,6 @@
 {
   "name": "iondrive",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "IonDrive CLI tool.",
   "main": "./lib/index.js",
   "bin": {
