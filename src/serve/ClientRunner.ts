@@ -40,6 +40,7 @@ class ClientRunner {
 
   private cordova: string;
   private device: boolean = false;
+  private compilerDone: boolean = false;
 
   constructor(clientDir: string, opts?: ClientOpts) {
     this.clientDir = clientDir;
@@ -108,6 +109,8 @@ class ClientRunner {
       }
 
       compiler.plugin('done', (stats) => {
+        if (this.compilerDone) return;
+        this.compilerDone = true;
         // if we're in hot mode create an index.html file which references the webpack-dev-server assets
         if (this.hot) {
           var indexAsset = stats.compilation.assets['index.html'];
@@ -115,7 +118,6 @@ class ClientRunner {
             fs.writeFileSync(path.join(devServerConfig.contentBase, 'index.html'), indexAsset.source())
           }
         }
-        console.log(path.resolve(devServerConfig.contentBase, '..'))
 
         var device = childProcess.spawn('ionic', ['run', this.cordova, (this.device ? ' --device' : '')], {
           cwd: path.resolve(devServerConfig.contentBase, '..'),
