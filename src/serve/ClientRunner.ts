@@ -10,7 +10,9 @@ import webpack = require("webpack");
 import WebpackDevServer = require("webpack-dev-server");
 import _ = require('lodash');
 
+
 import network = require('../network');
+import safariDebugger = require('../debugger');
 import env = require('../env');
 
 interface ModuleEnvs {
@@ -25,6 +27,7 @@ interface ClientOpts {
   cordova: string;
   device: boolean;
   lan: boolean;
+  debug: boolean;
 }
 
 const WEBPACK_FILENAME = 'webpack.config.js';
@@ -40,7 +43,10 @@ class ClientRunner {
 
   private cordova: string;
   private device: boolean = false;
+  private debugger: boolean = false;
+
   private compilerDone: boolean = false;
+
 
   constructor(clientDir: string, opts?: ClientOpts) {
     this.clientDir = clientDir;
@@ -52,6 +58,7 @@ class ClientRunner {
     this.proxy = opts ? !opts.lan : (opts.proxy || this.proxy);
     this.webpackConfigPath = (opts && opts.webpackConfigPath) || path.join(this.clientDir, WEBPACK_FILENAME);
     this.cordova = (opts && opts.cordova) || this.cordova;
+    this.debugger = (opts && opts.debug) || this.debugger;
   }
 
   private checkWebpackConfigPath() {
@@ -121,13 +128,41 @@ class ClientRunner {
 
         var device = childProcess.spawn('ionic', ['run', this.cordova, (this.device ? ' --device' : '')], {
           cwd: path.resolve(devServerConfig.contentBase, '..'),
-          env: projectEnv,
-          stdio: 'inherit'
+          env: projectEnv
         });
 
-        console.log(chalk.green(this.cordova + ' simulator'), (this.hot ? 'connected to webpack-dev-server ' + chalk.magenta('in hot mode') : 'running local assets'));
-      });
+        device.stderr.pipe(process.stderr);
+        device.stdout.pipe(process.stdout);
 
+        if (this.debugger) {
+          var deviceName;
+          device.stdout.on('data', (data) => {
+            if (this.device) {
+              if (data.toString().indexOf('Starting debug of') > -1) {
+                var remoteDebuggerInfo = data.toString();
+                deviceName = remoteDebuggerInfo.substring(remoteDebuggerInfo.indexOf("'") + 1, remoteDebuggerInfo.lastIndexOf("'"));
+              }
+
+              if (data.toString().indexOf('Finished load of') > -1) {
+                console.log(chalk.green(this.cordova + ' simulator'), (this.hot ? 'connected to webpack-dev-server ' + chalk.magenta('in hot mode') : 'running local assets'));
+                safariDebugger.start(deviceName, 0, (err, res) => {
+                  if (err) return console.log(chalk.red('ERR safari debugger'), err);
+                  console.log(chalk.green('safari debugger'), ' connected to ', deviceName);
+                });
+              }
+            } else {
+              if (data.toString().indexOf('** RUN SUCCEEDED **') > -1) {
+                deviceName = 'iOS Simulator';
+                safariDebugger.start(deviceName, 4000, (err, res) => {
+                  if (err) return console.log(chalk.red('ERR safari debugger'), err);
+                  console.log(chalk.green('safari debugger'), 'connected to', deviceName);
+                });
+              }
+            }
+
+          });
+        }
+      });
     }
 
     if (this.cordova && !this.hot) {

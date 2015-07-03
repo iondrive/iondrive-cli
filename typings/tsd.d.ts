@@ -13,3 +13,5 @@
 /// <reference path="glob/glob.d.ts" />
 /// <reference path="minimatch/minimatch.d.ts" />
 /// <reference path="lodash/lodash.d.ts" />
+/// <reference path="applescript/applescript.d.ts" />
+/// <reference path="handlebars/handlebars.d.ts" />
