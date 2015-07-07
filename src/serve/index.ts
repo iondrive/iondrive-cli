@@ -14,7 +14,6 @@ program
     if (platform && ['ios', 'android'].indexOf(platform.toLowerCase()) > -1 ) {
       options.cordova = platform.toLowerCase();
     }
-    console.log(options);
     new Runner(process.cwd(), options).start();
   })
   .on('--help', function() {
