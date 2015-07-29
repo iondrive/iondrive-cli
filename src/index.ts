@@ -8,6 +8,7 @@ program
 
 require('./backup/');
 require('./serve/');
+require('./secrets/');
 
 program.parse(process.argv);
 // handle no command
