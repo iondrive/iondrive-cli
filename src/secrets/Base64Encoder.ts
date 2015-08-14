@@ -20,12 +20,12 @@ class Encoder {
       Object.keys(item.data).forEach(function (key) {
         var val = item.data[key];
         var isBase64 = base64Matcher.test(val);
-        
+
         if (key === 'env') {
           if (_.isObject(val)) {
             var envString = '';
             Object.keys(val).forEach(function (key) {
-              envString += `export ${key}=\"${val[key]}\"\n`;
+              envString += `export ${key}="${val[key]}"\n`;
             });
             val = envString;
           }
