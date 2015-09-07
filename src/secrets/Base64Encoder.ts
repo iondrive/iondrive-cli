@@ -4,7 +4,7 @@ import _ = require('lodash');
 import chalk = require('chalk');
 import glob = require('glob');
 
-const base64Matcher = new RegExp("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$");
+const base64Pattern = new RegExp("^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{4})$");
 
 class Encoder {
   private fileName: string;
@@ -16,10 +16,22 @@ class Encoder {
   }
 
   run () {
+    var isBase64 = true;
+
+    // We assume that all values are base64 encoded. If any of the values are
+    // NOT base64 encoded, none of them are.
     this.file.items.forEach(function (item) {
       Object.keys(item.data).forEach(function (key) {
         var val = item.data[key];
-        var isBase64 = base64Matcher.test(val);
+        if (!base64Pattern.test(val)) {
+          isBase64 = false;
+        }
+      });
+    });
+
+    this.file.items.forEach(function (item) {
+      Object.keys(item.data).forEach(function (key) {
+        var val = item.data[key];
 
         if (key === 'env') {
           if (_.isObject(val)) {
