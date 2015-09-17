@@ -22,21 +22,22 @@
   "license": "MIT",
   "dependencies": {
     "applescript": "^1.0.0",
-    "aws-sdk": "^2.2.0",
+    "aws-sdk": "^2.2.2",
     "chalk": "^1.1.1",
     "commander": "^2.8.1",
     "glob": "^5.0.14",
     "http-proxy": "^1.11.2",
     "lodash": "^3.10.1",
     "moment": "^2.10.6",
-    "nodemon": "^1.4.1",
+    "nodemon": "^1.5.1",
     "rimraf": "^2.4.3",
     "tar-fs": "^1.8.1",
-    "webpack": "^1.12.1",
+    "webpack": "^1.12.2",
     "handlebars": "^4.0.2",
-    "webpack-dev-server": "^1.10.1"
+    "webpack-dev-server": "^1.11.0"
   },
   "devDependencies": {
-    "typescript": "^1.6.0-beta"
+    "ts-globber": "^0.4.3",
+    "typescript": "^1.6.2"
   }
 }

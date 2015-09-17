@@ -58,14 +58,16 @@ class ServerRunner {
       cwd: this.serverDir,
       env: _.extend(process.env, this.env)
     })
-    child.stderr.pipe(process.stderr);
-    child.stdout.pipe(process.stdout);
     child.stdout.on('data', (data) => {
       if (data.toString().indexOf('listening') > -1 && !started) {
-        console.log(chalk.green(this.name), `running at http://${this.host}:${this.port}`);
+        var portNumber = data.toString().match(/[0-9]+/g).slice(-1).pop();
+        console.log(chalk.green(this.name), `running at http://${this.host}:${portNumber}`);
+        child.stdout.pipe(process.stdout);
         started = true;
       }
     });
+    child.stderr.pipe(process.stderr);
+
   };
 }
 

@@ -28,6 +28,7 @@ interface ClientOpts {
   device: boolean;
   lan: boolean;
   debug: boolean;
+  ssl: boolean
 }
 
 const WEBPACK_FILENAME = 'webpack.config.js';
@@ -44,6 +45,7 @@ class ClientRunner {
   private cordova: string;
   private device: boolean = false;
   private debugger: boolean = false;
+  private forceSSL: boolean = false;
 
   private compilerDone: boolean = false;
 
@@ -59,6 +61,7 @@ class ClientRunner {
     this.webpackConfigPath = (opts && opts.webpackConfigPath) || path.join(this.clientDir, WEBPACK_FILENAME);
     this.cordova = (opts && opts.cordova) || this.cordova;
     this.debugger = (opts && opts.debug) || this.debugger;
+    this.forceSSL = (opts && opts.ssl) || this.forceSSL;
   }
 
   private checkWebpackConfigPath() {
@@ -85,12 +88,14 @@ class ClientRunner {
     }
 
     var devServerConfig = webpackOpts.devServer || {};
+    devServerConfig.https = this.forceSSL;
     devServerConfig.hot = this.hot;
     devServerConfig.inline = this.hot;
     devServerConfig.quiet = false;
     devServerConfig.noInfo = false;
     devServerConfig.stats = { colors: true };
     devServerConfig.contentBase = webpackOpts.output.path;
+    devServerConfig.protcol = devServerConfig.https ? 'https': 'http';
 
     if (this.proxy && webpackOpts.devServer.proxy && !this.device) {
       const URI_REGEXP = new RegExp("^(.*:)//([A-Za-z0-9\-\.]+)(:[0-9]+)?(.*)$");
@@ -101,7 +106,7 @@ class ClientRunner {
             var definitions = plugin[key];
             Object.keys(definitions).forEach((propKey) => {
               var defineConst = (plugin[key][propKey] || "").replace(/['"]+/g, '');
-              plugin[key][propKey] = JSON.stringify(defineConst.replace(URI_REGEXP, `http://$2:${this.port}$4`));
+              plugin[key][propKey] = JSON.stringify(defineConst.replace(URI_REGEXP, `${devServerConfig.protcol}://$2:${this.port}$4`));
             })
           }
         })
@@ -112,7 +117,7 @@ class ClientRunner {
     if (this.cordova) {
       if (this.hot) {
         // cordova requires an index.html page. So create one and address webpack-dev-server assets
-        webpackOpts.output.publicPath = 'http://' + this.host + ':' + this.port + '/';
+        webpackOpts.output.publicPath = `${devServerConfig.protcol}://${this.host}:${this.port}/`;
       }
 
       compiler.plugin('done', (stats) => {
@@ -165,7 +170,7 @@ class ClientRunner {
       });
     }
 
-    if (this.cordova && !this.hot) {
+    if (this.cordova && !this.hot && !devServerConfig.https) {
       console.log(chalk.green('webpack'), 'compiling assets for', this.cordova, '...');
       compiler.run(() => {
         console.log(chalk.green('webpack'), 'compiled assets for', this.cordova);
@@ -173,9 +178,9 @@ class ClientRunner {
     } else {
       new WebpackDevServer(compiler, devServerConfig)
         .listen(this.port, () => {
-          console.log(chalk.green('webpack-dev-server'), `running at http://${this.host}:${this.port}`, this.hot ? chalk.magenta('in hot mode'): '');
+          console.log(chalk.green('webpack-dev-server'), `running at ${devServerConfig.protcol}://${this.host}:${this.port}`, this.hot ? chalk.magenta('in hot mode'): '');
           Object.keys(devServerConfig.proxy).forEach((proxyPath) => {
-            console.log(chalk.green('proxy ' + proxyPath + ' server'), `running at http://${this.host}:${this.port}` + proxyPath);
+            console.log(chalk.green('proxy server'), `running at ${devServerConfig.protcol}://${this.host}:${this.port}`);
           });
         });
     }

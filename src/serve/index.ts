@@ -9,6 +9,7 @@ program
   .option("-d, --device", "Target physical device.")
   .option("-a, --all", "Boot up dependencies")
   .option("-l, --lan", "Address servers by local network ip")
+  .option("-s, --ssl", "force ssl")
   .option("--debug", "Attach safari debugger")
   .action(function(platform, options) {
     if (platform && ['ios', 'android'].indexOf(platform.toLowerCase()) > -1 ) {
