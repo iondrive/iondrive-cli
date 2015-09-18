@@ -105,7 +105,9 @@ class ClientRunner {
             var definitions = plugin[key];
             Object.keys(definitions).forEach((propKey) => {
               var defineConst = (plugin[key][propKey] || "").replace(/['"]+/g, '');
-              plugin[key][propKey] = JSON.stringify(defineConst.replace(URI_REGEXP, `${devServerConfig.protcol}://$2:${this.port}$4`));
+              var targetHost = this.cordova && !this.hot ? `${devServerConfig.protcol}://$2$3$4`: `${devServerConfig.protcol}://$2:${this.port}$4`;
+              console.log('targetHost', defineConst.replace(URI_REGEXP, targetHost))
+              plugin[key][propKey] = JSON.stringify(defineConst.replace(URI_REGEXP, targetHost));
             });
           }
         })
