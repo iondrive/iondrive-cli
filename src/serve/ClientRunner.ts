@@ -49,7 +49,6 @@ class ClientRunner {
 
   private compilerDone: boolean = false;
 
-
   constructor(clientDir: string, opts?: ClientOpts) {
     this.clientDir = clientDir;
 
@@ -76,17 +75,6 @@ class ClientRunner {
     var projectEnv = _.extend(process.env, env.configure(this.clientDir, this.host, this.port));
     var webpackOpts = require(this.webpackConfigPath);
 
-    if (this.hot) {
-      var mainEntry = webpackOpts.entry.app || webpackOpts.entry;
-      mainEntry.push('webpack-dev-server/client?http://' + this.host + ':' + this.port)
-      mainEntry.push('webpack/hot/dev-server');
-      webpackOpts.plugins = webpackOpts.plugins || [];
-      webpackOpts.plugins.push(new webpack.HotModuleReplacementPlugin());
-
-      // delete and previous outputs as webpack-dev-server hosts all in memory.
-      rimraf.sync(webpackOpts.output.path + '/*');
-    }
-
     var devServerConfig = webpackOpts.devServer || {};
     devServerConfig.https = this.forceSSL;
     devServerConfig.hot = this.hot;
@@ -96,6 +84,17 @@ class ClientRunner {
     devServerConfig.stats = { colors: true };
     devServerConfig.contentBase = webpackOpts.output.path;
     devServerConfig.protcol = devServerConfig.https ? 'https': 'http';
+
+    if (this.hot) {
+      var mainEntry = webpackOpts.entry.app || webpackOpts.entry;
+      mainEntry.push(`webpack-dev-server/client?${devServerConfig.protcol}://${this.host}:${this.port}`)
+      mainEntry.push('webpack/hot/dev-server');
+      webpackOpts.plugins = webpackOpts.plugins || [];
+      webpackOpts.plugins.push(new webpack.HotModuleReplacementPlugin());
+
+      // delete and previous outputs as webpack-dev-server hosts all in memory.
+      rimraf.sync(webpackOpts.output.path + '/*');
+    }
 
     if (this.proxy && webpackOpts.devServer.proxy && !this.device) {
       const URI_REGEXP = new RegExp("^(.*:)//([A-Za-z0-9\-\.]+)(:[0-9]+)?(.*)$");
@@ -107,7 +106,7 @@ class ClientRunner {
             Object.keys(definitions).forEach((propKey) => {
               var defineConst = (plugin[key][propKey] || "").replace(/['"]+/g, '');
               plugin[key][propKey] = JSON.stringify(defineConst.replace(URI_REGEXP, `${devServerConfig.protcol}://$2:${this.port}$4`));
-            })
+            });
           }
         })
       })
@@ -170,7 +169,7 @@ class ClientRunner {
       });
     }
 
-    if (this.cordova && !this.hot && !devServerConfig.https) {
+    if (!!this.cordova && !this.hot) {
       console.log(chalk.green('webpack'), 'compiling assets for', this.cordova, '...');
       compiler.run(() => {
         console.log(chalk.green('webpack'), 'compiled assets for', this.cordova);
@@ -184,7 +183,6 @@ class ClientRunner {
           });
         });
     }
-
   }
 }
 
