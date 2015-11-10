@@ -31,6 +31,7 @@ interface ClientOpts {
   ssl: boolean
 }
 
+const URI_REGEXP = new RegExp("^(.*:)//([A-Za-z0-9\-\.]+)(:[0-9]+)?(.*)$");
 const WEBPACK_FILENAME = 'webpack.config.js';
 
 class ClientRunner {
@@ -96,23 +97,19 @@ class ClientRunner {
       rimraf.sync(webpackOpts.output.path + '/*');
     }
 
-    if (this.proxy && webpackOpts.devServer.proxy && !this.device) {
-      const URI_REGEXP = new RegExp("^(.*:)//([A-Za-z0-9\-\.]+)(:[0-9]+)?(.*)$");
-      webpackOpts.plugins.forEach((plugin) => {
-        Object.keys(plugin).forEach((key) => {
-         // signals DefinePlugin
-          if (key === 'definitions') {
-            var definitions = plugin[key];
-            Object.keys(definitions).forEach((propKey) => {
-              var defineConst = (plugin[key][propKey] || "").replace(/['"]+/g, '');
-              var targetHost = this.cordova && !this.hot ? `${devServerConfig.protcol}://$2$3$4`: `${devServerConfig.protcol}://$2:${this.port}$4`;
-              console.log('targetHost', defineConst.replace(URI_REGEXP, targetHost))
-              plugin[key][propKey] = JSON.stringify(defineConst.replace(URI_REGEXP, targetHost));
-            });
-          }
-        })
+    webpackOpts.plugins.forEach((plugin) => {
+      Object.keys(plugin).forEach((key) => {
+       // signals DefinePlugin
+        if (key === 'definitions') {
+          var definitions = plugin[key];
+          Object.keys(definitions).forEach((propKey) => {
+            var defineConst = (plugin[key][propKey] || "").replace(/['"]+/g, '');
+            var targetHost = this.cordova && !this.hot ? `${devServerConfig.protcol}://${this.host}$3$4`: `${devServerConfig.protcol}://${this.host}:${this.port}$4`;
+            plugin[key][propKey] = JSON.stringify(defineConst.replace(URI_REGEXP, targetHost));
+          });
+        }
       })
-    }
+    });
 
     var compiler = webpack(webpackOpts);
     if (this.cordova) {

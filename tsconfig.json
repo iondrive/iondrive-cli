@@ -25,8 +25,8 @@
         "./src/secrets/Base64Encoder.ts",
         "./src/secrets/index.ts",
         "./src/serve/ClientRunner.ts",
+        "./src/serve/index.ts",
         "./src/serve/Runner.ts",
-        "./src/serve/ServerRunner.ts",
-        "./src/serve/index.ts"
+        "./src/serve/ServerRunner.ts"
     ]
 }
