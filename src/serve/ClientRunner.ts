@@ -31,7 +31,7 @@ interface ClientOpts {
   ssl: boolean
 }
 
-const URI_REGEXP = new RegExp("^(.*:)//([A-Za-z0-9\-\.]+)(:[0-9]+)?(.*)$");
+const LOCALHOST_URI_REGEXP = new RegExp("^(.*:)//(localhost)(:[0-9]+)?(.*)$");
 const WEBPACK_FILENAME = 'webpack.config.js';
 
 class ClientRunner {
@@ -105,7 +105,7 @@ class ClientRunner {
           Object.keys(definitions).forEach((propKey) => {
             var defineConst = (plugin[key][propKey] || "").replace(/['"]+/g, '');
             var targetHost = this.cordova && !this.hot ? `${devServerConfig.protcol}://${this.host}$3$4`: `${devServerConfig.protcol}://${this.host}:${this.port}$4`;
-            plugin[key][propKey] = JSON.stringify(defineConst.replace(URI_REGEXP, targetHost));
+            plugin[key][propKey] = JSON.stringify(defineConst.replace(LOCALHOST_URI_REGEXP, targetHost));
           });
         }
       })
