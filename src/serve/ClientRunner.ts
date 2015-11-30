@@ -6,8 +6,8 @@ import childProcess = require('child_process');
 
 import rimraf = require('rimraf');
 import chalk = require('chalk');
-import webpack = require("webpack");
-import WebpackDevServer = require("webpack-dev-server");
+import webpack = require('webpack');
+import WebpackDevServer = require('webpack-dev-server');
 import _ = require('lodash');
 
 
@@ -31,7 +31,7 @@ interface ClientOpts {
   ssl: boolean
 }
 
-const LOCALHOST_URI_REGEXP = new RegExp("^(.*:)//(localhost)(:[0-9]+)?(.*)$");
+const LOCALHOST_URI_REGEXP = new RegExp('^(.*:)//(localhost)(:[0-9]+)?(.*)$');
 const WEBPACK_FILENAME = 'webpack.config.js';
 
 class ClientRunner {
@@ -103,7 +103,7 @@ class ClientRunner {
         if (key === 'definitions') {
           var definitions = plugin[key];
           Object.keys(definitions).forEach((propKey) => {
-            var defineConst = (plugin[key][propKey] || "").replace(/['"]+/g, '');
+            var defineConst = (plugin[key][propKey] || '').replace(/['"]+/g, '');
             var targetHost = this.cordova && !this.hot ? `${devServerConfig.protcol}://${this.host}$3$4`: `${devServerConfig.protcol}://${this.host}:${this.port}$4`;
             plugin[key][propKey] = JSON.stringify(defineConst.replace(LOCALHOST_URI_REGEXP, targetHost));
           });
