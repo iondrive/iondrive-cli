@@ -6,37 +6,40 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "node/node.d.ts": {
-      "commit": "b04ad99e8b389bf377a2bd3ae582e7ecb553c09a"
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
     },
     "aws-sdk/aws-sdk.d.ts": {
-      "commit": "6c2589a6335713cc5b88701d607a2770f1c53b63"
-    },
-    "moment/moment.d.ts": {
-      "commit": "6c2589a6335713cc5b88701d607a2770f1c53b63"
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
     },
     "bunyan/bunyan.d.ts": {
-      "commit": "6c2589a6335713cc5b88701d607a2770f1c53b63"
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
     },
     "commander/commander.d.ts": {
-      "commit": "6c2589a6335713cc5b88701d607a2770f1c53b63"
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
     },
     "chalk/chalk.d.ts": {
-      "commit": "68114f9ff37de0f92c94126b6e0164e026a1737a"
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
     },
     "rimraf/rimraf.d.ts": {
-      "commit": "c50b111ded0a3a18b87b5abffea3150d6aca94da"
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
     },
     "glob/glob.d.ts": {
-      "commit": "faff1866df10486a4c50904236183edc62ca841e"
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
     },
     "minimatch/minimatch.d.ts": {
-      "commit": "faff1866df10486a4c50904236183edc62ca841e"
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
     },
     "lodash/lodash.d.ts": {
-      "commit": "43b6bf88758852b9ab713a9b011487f047f94f4e"
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
     },
     "handlebars/handlebars.d.ts": {
-      "commit": "1632606f82cfbaf89d4b96b8dccacfaf2a6ae2f3"
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
+    },
+    "moment/moment.d.ts": {
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
+    },
+    "moment/moment-node.d.ts": {
+      "commit": "fb2b3b1e068c9ff7d8f9b0851c08d37d96c95c38"
     }
   }
 }

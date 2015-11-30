@@ -15,10 +15,6 @@ import network = require('../network');
 import safariDebugger = require('../debugger');
 import env = require('../env');
 
-interface ModuleEnvs {
-  API_URI: string
-}
-
 interface ClientOpts {
   port: number;
   hot: boolean;
@@ -99,31 +95,39 @@ class ClientRunner {
       rimraf.sync(webpackOpts.output.path + '/*');
     }
 
-    webpackOpts.plugins.forEach((plugin) => {
-      Object.keys(plugin).forEach((key) => {
-       // signals DefinePlugin
-        if (key === 'definitions') {
-          var definitions = plugin[key];
-          Object.keys(definitions).forEach((propKey) => {
-            var defineConst = (plugin[key][propKey] || '').replace(/['"]+/g, '');
-            var targetHost = this.cordova && !this.hot ? `${devServerConfig.protocol}://${this.host}$3$4`: `${devBaseUri}$4`;
-            plugin[key][propKey] = JSON.stringify(defineConst.replace(LOCALHOST_URI_REGEXP, targetHost));
-          });
-        }
-      })
+    _.each<any>(webpackOpts.plugins, ({definitions}) => {
+      // a definitions key indicates a DefinePlugin
+      if (!definitions) return;
+
+      _.each<any>(definitions, (value, key) => {
+        if (typeof value !== 'string') return;
+
+        // DefinePlugin uses strings as code fragments, so if you want to define a string it must
+        // be JSON encoded, i.e. double-quoted. Any non-string encoded items, such as objects or
+        // primitives are ignored while unencoded strings will throw an error and also be ignored.
+        try {
+          value = JSON.parse(value);
+          if (typeof value !== 'string') return;
+
+          var targetHost = this.cordova && !this.hot
+            ? `${devServerConfig.protocol}://${this.host}$3$4`
+            : `${devBaseUri}$4`;
+          definitions[key] = JSON.stringify(value.replace(LOCALHOST_URI_REGEXP, targetHost));
+        } catch (e) {}
+      });
     });
 
     var compiler = webpack(webpackOpts);
     if (this.cordova) {
       if (this.hot) {
-        // cordova requires an index.html page. So create one and address webpack-dev-server assets
+        // Cordova requires an index.html page, so create one and address webpack-dev-server assets
         webpackOpts.output.publicPath = `${devBaseUri}/`;
       }
 
       compiler.plugin('done', (stats) => {
         if (this.compilerDone) return;
         this.compilerDone = true;
-        // if we're in hot mode create an index.html file which references the webpack-dev-server assets
+        // If we're in hot mode create an index.html file which references the webpack-dev-server // assets
         if (this.hot) {
           var indexAsset = stats.compilation.assets['index.html'];
           if (indexAsset) {
