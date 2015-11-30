@@ -84,11 +84,13 @@ class ClientRunner {
     devServerConfig.noInfo = false;
     devServerConfig.stats = { colors: true };
     devServerConfig.contentBase = webpackOpts.output.path;
-    devServerConfig.protcol = devServerConfig.https ? 'https': 'http';
+    devServerConfig.protocol = devServerConfig.https ? 'https': 'http';
+
+    var devBaseUri = `${devServerConfig.protocol}://${this.host}:${this.port}`;
 
     if (this.hot) {
       var mainEntry = webpackOpts.entry.app || webpackOpts.entry;
-      mainEntry.push(`webpack-dev-server/client?${devServerConfig.protcol}://${this.host}:${this.port}`)
+      mainEntry.push(`webpack-dev-server/client?${devBaseUri}`)
       mainEntry.push('webpack/hot/dev-server');
       webpackOpts.plugins = webpackOpts.plugins || [];
       webpackOpts.plugins.push(new webpack.HotModuleReplacementPlugin());
@@ -104,7 +106,7 @@ class ClientRunner {
           var definitions = plugin[key];
           Object.keys(definitions).forEach((propKey) => {
             var defineConst = (plugin[key][propKey] || '').replace(/['"]+/g, '');
-            var targetHost = this.cordova && !this.hot ? `${devServerConfig.protcol}://${this.host}$3$4`: `${devServerConfig.protcol}://${this.host}:${this.port}$4`;
+            var targetHost = this.cordova && !this.hot ? `${devServerConfig.protocol}://${this.host}$3$4`: `${devBaseUri}$4`;
             plugin[key][propKey] = JSON.stringify(defineConst.replace(LOCALHOST_URI_REGEXP, targetHost));
           });
         }
@@ -115,7 +117,7 @@ class ClientRunner {
     if (this.cordova) {
       if (this.hot) {
         // cordova requires an index.html page. So create one and address webpack-dev-server assets
-        webpackOpts.output.publicPath = `${devServerConfig.protcol}://${this.host}:${this.port}/`;
+        webpackOpts.output.publicPath = `${devBaseUri}/`;
       }
 
       compiler.plugin('done', (stats) => {
@@ -176,9 +178,9 @@ class ClientRunner {
     } else {
       new WebpackDevServer(compiler, devServerConfig)
         .listen(this.port, () => {
-          console.log(chalk.green('webpack-dev-server'), `running at ${devServerConfig.protcol}://${this.host}:${this.port}`, this.hot ? chalk.magenta('in hot mode'): '');
+          console.log(chalk.green('webpack-dev-server'), `running at ${devBaseUri}`, this.hot ? chalk.magenta('in hot mode'): '');
           Object.keys(devServerConfig.proxy).forEach((proxyPath) => {
-            console.log(chalk.green('proxy server'), `running at ${devServerConfig.protcol}://${this.host}:${this.port}`);
+            console.log(chalk.green('proxy server'), `running at ${devBaseUri}`);
           });
         });
     }
